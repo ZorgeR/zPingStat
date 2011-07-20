@@ -1,18 +1,29 @@
 #include <conio.h>
 #include <stdio.h>
 #include <windows.h>
+//#include <iostream>
+#include <string>
+
+// REDRAW Interval (query)
+#define interval 1
+
+// IP or Domain name
+// #define URL ya.ru
+
+
 /*
     zPingStat
     zLab - 2011
     cc-by-nc-sa
     
-    r111
+    r112
 */
- 
-int main()
+
+int main(int argc, char *argv[])
 {
-    int  REDRAW;
-    char ping_check,ip;
+    int  REDRAW,ip,ping_check,i;
+    int build=111;
+    int timeout=900;
 
 // ALL VAR
           int all_all,all_miss,all_good,all_min,all_max,all_avg;
@@ -36,17 +47,72 @@ int main()
           all_all=all_miss=all_good=all_min=all_max=all_avg=h24_all=h24_miss=h24_good=h24_min=h24_max=h24_avg=h10_all=h10_miss=h10_good=h10_min=h10_max=h10_avg=h1_all=h1_miss=h1_good=h1_min=h1_max=h1_avg=m30_all=m30_miss=m30_good=m30_min=m30_max=m30_avg=m10_all=m10_miss=m10_good=m10_min=m10_max=m10_avg=m1_all=m1_miss=m1_good=m1_min=m1_max=m1_avg=0;
           all_miss_prcnt=h24_miss_prcnt=h10_miss_prcnt=h1_miss_prcnt=m30_miss_prcnt=m10_miss_prcnt=m1_miss_prcnt=0;
           all_good_prcnt=h24_good_prcnt=h10_good_prcnt=h1_good_prcnt=m30_good_prcnt=m10_good_prcnt=m1_good_prcnt=0;
-// ip
-ip=0;
 
- 
+//ARGV check
+ip=0;
+i=0;
+
+if(argc<2)
+          {
+               printf("------------------\n");
+               printf("| zPingStat r%3d |\n",build);
+               printf("------------------\n");
+               printf("\n");
+               printf(" No IP or domain name found.\n");
+               printf("\n");
+               printf(" Need argument.\n");
+               printf("\n");
+               printf(" example:\n");
+               printf(" ../zpingstat.exe -ip ya.ru\n");
+               printf(" or\n");
+               printf(" ../zpingstat.exe -ip 127.0.0.1\n");
+               printf("\n");
+               printf("\n");
+               printf("\n");
+               printf("------------------\n");
+               printf("| zLab  -  2011  |\n");
+               printf("------------------\n");
+               getch();
+               exit(1);
+           }
+
+for(int i =0;i<argc;i++)
+    {     if (strcmp(argv[i],"-ip") == 0)
+          ip=i+1;
+          else if (strcmp(argv[i],"-help") == 0)
+          {
+               printf("------------------\n");
+               printf("| zPingStat r%3d |\n",build);
+               printf("------------------\n");
+               printf("\n");
+               printf(" No IP or domain name found.\n");
+               printf("\n");
+               printf(" Need argument.\n");
+               printf("\n");
+               printf(" example:\n");
+               printf(" ../zpingstat.exe -ip ya.ru\n");
+               printf(" or\n");
+               printf(" ../zpingstat.exe -ip 127.0.0.1\n");
+               printf("\n");
+               printf("\n");
+               printf("\n");
+               printf("------------------\n");
+               printf("| zLab  -  2011  |\n");
+               printf("------------------\n");
+               getch();
+               exit(1);
+           }
+          ;
+    }
+
+std::string my_string("ping -w %3d -n 1 ya.ru",timeout);
+
 //printTABLE:
   printTABLE:
 system("cls");
 REDRAW=0;
- 
     printf(".-----------------------------------------------------------------.\n");
-    printf("|  zPingStat     | IP : %15d   |        Latency        |\n",ip);
+    printf("|  zPingStat     | IP : %15s   |        Latency        |\n", argv[ip]);
     printf("|----------------|------------------------|-----------------------|\n");
     printf("|Type:           | Summary  | Miss | Good |  min  |  max  |  avg  |\n");
     printf("|----------------|----------|------|------|-------|-------|-------|\n");
@@ -63,7 +129,7 @@ REDRAW=0;
     printf("|10 min  (600)   | %8d | %3d%% | %3d%% | %3dms | %3dms | %3dms |\n",m10_all,m10_miss_prcnt,m10_good_prcnt,m10_min,m10_max,m10_avg);
     printf("|----------------|----------|------|------|-------|-------|-------|\n");
     printf("|1  min  (60)    | %8d | %3d%% | %3d%% | %3dms | %3dms | %3dms |\n",m1_all,m1_miss_prcnt,m1_good_prcnt,m1_min,m1_max,m1_avg);
-    printf("`-----------------------------------------------------------------`\n");
+    printf("`-----------------------------------------------------------------'\n");
 
 // Reset block Start
       // h24_reset
@@ -87,15 +153,16 @@ REDRAW=0;
  
 //REDRAWtable:
   REDRAWtable:
-if (REDRAW==12)
+if (REDRAW==interval)
 goto getPercentage;
  
 //  doPing:
-ping_check=system("ping -w 100 -n 1 ya.ru > nul");
- 
+ping_check=system( my_string.c_str() );    
+
+
 //  Sleep
 Sleep(1000);
- 
+
 //  Counter
 all_all=++all_all;
 h24_all=++h24_all;
@@ -107,7 +174,7 @@ m10_all=++m10_all;
 
 REDRAW=++REDRAW;
  
-if (ping_check == NULL)
+if (ping_check == 0)
     goto SEC;
 else
     goto unSEC;
@@ -156,6 +223,11 @@ h1_good_prcnt=h1_good*100/h1_all;
 m30_good_prcnt=m30_good*100/m30_all;
 m10_good_prcnt=m10_good*100/m10_all;
 m1_good_prcnt=m1_good*100/m1_all;
+
+//getLatency
+//all_min
+//all_max
+//all_avg
 
 goto printTABLE;
 
