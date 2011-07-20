@@ -1,29 +1,26 @@
 #include <conio.h>
 #include <stdio.h>
 #include <windows.h>
-//#include <iostream>
+#include <iostream>
 #include <string>
-
+using namespace std;
 // REDRAW Interval (query)
-#define interval 1
+#define interval 12
 
-// IP or Domain name
-// #define URL ya.ru
-
+// IP or Domain name ping statistic generator
 
 /*
     zPingStat
     zLab - 2011
     cc-by-nc-sa
     
-    r112
+    r113
 */
 
 int main(int argc, char *argv[])
 {
-    int  REDRAW,ip,ping_check,i;
-    int build=111;
-    int timeout=900;
+    int REDRAW,ip,ping_check,i,failtime;
+    int build=113;
 
 // ALL VAR
           int all_all,all_miss,all_good,all_min,all_max,all_avg;
@@ -49,10 +46,9 @@ int main(int argc, char *argv[])
           all_good_prcnt=h24_good_prcnt=h10_good_prcnt=h1_good_prcnt=m30_good_prcnt=m10_good_prcnt=m1_good_prcnt=0;
 
 //ARGV check
-ip=0;
-i=0;
+ip=i=failtime=0;
 
-if(argc<2)
+if(argc<5)
           {
                printf("------------------\n");
                printf("| zPingStat r%3d |\n",build);
@@ -63,10 +59,11 @@ if(argc<2)
                printf(" Need argument.\n");
                printf("\n");
                printf(" example:\n");
-               printf(" ../zpingstat.exe -ip ya.ru\n");
+               printf(" ../zpingstat.exe -ip ya.ru -t 300\n");
                printf(" or\n");
-               printf(" ../zpingstat.exe -ip 127.0.0.1\n");
+               printf(" ../zpingstat.exe -t 150 -ip 127.0.0.1\n");
                printf("\n");
+               printf(" -t / time to marked ping as fail.\n");
                printf("\n");
                printf("\n");
                printf("------------------\n");
@@ -79,6 +76,8 @@ if(argc<2)
 for(int i =0;i<argc;i++)
     {     if (strcmp(argv[i],"-ip") == 0)
           ip=i+1;
+          else if (strcmp(argv[i],"-t") == 0)
+          failtime=i+1;
           else if (strcmp(argv[i],"-help") == 0)
           {
                printf("------------------\n");
@@ -90,10 +89,11 @@ for(int i =0;i<argc;i++)
                printf(" Need argument.\n");
                printf("\n");
                printf(" example:\n");
-               printf(" ../zpingstat.exe -ip ya.ru\n");
+               printf(" ../zpingstat.exe -ip ya.ru -t 300\n");
                printf(" or\n");
-               printf(" ../zpingstat.exe -ip 127.0.0.1\n");
+               printf(" ../zpingstat.exe -t 150 -ip 127.0.0.1\n");
                printf("\n");
+               printf(" -t / time to marked ping as fail.\n");
                printf("\n");
                printf("\n");
                printf("------------------\n");
@@ -105,14 +105,29 @@ for(int i =0;i<argc;i++)
           ;
     }
 
-std::string my_string("ping -w %3d -n 1 ya.ru",timeout);
+    string doping  =("ping");
+    string timeout =("-w");
+    string ftime   =argv[failtime];
+    string repeat  =("-n 1");
+    string domain  =argv[ip];
+    string nolog   =("> nul");
+    doping.append(" ");
+    doping.append(timeout);
+    doping.append(" ");
+    doping.append(ftime);
+    doping.append(" ");
+    doping.append(repeat);
+    doping.append(" ");
+    doping.append(domain);
+    doping.append(" ");
+    doping.append(nolog);
 
 //printTABLE:
   printTABLE:
 system("cls");
 REDRAW=0;
     printf(".-----------------------------------------------------------------.\n");
-    printf("|  zPingStat     | IP : %15s   |        Latency        |\n", argv[ip]);
+    printf("|  zPingStat     | IP : %15s   |    <%4sms Latency    |\n", argv[ip],argv[failtime]);
     printf("|----------------|------------------------|-----------------------|\n");
     printf("|Type:           | Summary  | Miss | Good |  min  |  max  |  avg  |\n");
     printf("|----------------|----------|------|------|-------|-------|-------|\n");
@@ -130,6 +145,9 @@ REDRAW=0;
     printf("|----------------|----------|------|------|-------|-------|-------|\n");
     printf("|1  min  (60)    | %8d | %3d%% | %3d%% | %3dms | %3dms | %3dms |\n",m1_all,m1_miss_prcnt,m1_good_prcnt,m1_min,m1_max,m1_avg);
     printf("`-----------------------------------------------------------------'\n");
+    printf("\n");
+    printf("* Statistic update every %d query.\n",interval);
+    printf("* Latency statistic not calculated at this time.\n");
 
 // Reset block Start
       // h24_reset
@@ -157,8 +175,7 @@ if (REDRAW==interval)
 goto getPercentage;
  
 //  doPing:
-ping_check=system( my_string.c_str() );    
-
+    ping_check=system(doping.c_str());
 
 //  Sleep
 Sleep(1000);
