@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 using namespace std;
-// REDRAW Interval (query)
 #define interval 12
 
 // IP or Domain name ping statistic generator
@@ -14,13 +13,13 @@ using namespace std;
     zLab - 2011
     cc-by-nc-sa
     
-    r113
+    r114
 */
 
 int main(int argc, char *argv[])
 {
-    int REDRAW,ip,ping_check,i,failtime;
-    int build=113;
+    int REDRAW,ip,ping_check,i,failtime,help,iptrue,failtimetrue;
+    int build=114;
 
 // ALL VAR
           int all_all,all_miss,all_good,all_min,all_max,all_avg;
@@ -46,70 +45,35 @@ int main(int argc, char *argv[])
           all_good_prcnt=h24_good_prcnt=h10_good_prcnt=h1_good_prcnt=m30_good_prcnt=m10_good_prcnt=m1_good_prcnt=0;
 
 //ARGV check
-ip=i=failtime=0;
+ip=i=failtime=help=iptrue=failtimetrue=0;
 
-if(argc<5)
-          {
-               printf("------------------\n");
-               printf("| zPingStat r%3d |\n",build);
-               printf("------------------\n");
-               printf("\n");
-               printf(" No IP or domain name found.\n");
-               printf("\n");
-               printf(" Need argument.\n");
-               printf("\n");
-               printf(" example:\n");
-               printf(" ../zpingstat.exe -ip ya.ru -t 300\n");
-               printf(" or\n");
-               printf(" ../zpingstat.exe -t 150 -ip 127.0.0.1\n");
-               printf("\n");
-               printf(" -t / time to marked ping as fail.\n");
-               printf("\n");
-               printf("\n");
-               printf("------------------\n");
-               printf("| zLab  -  2011  |\n");
-               printf("------------------\n");
-               getch();
-               exit(1);
-           }
+string ftime   =("5000");
+string domain  =("t.co");
 
 for(int i =0;i<argc;i++)
     {     if (strcmp(argv[i],"-ip") == 0)
-          ip=i+1;
-          else if (strcmp(argv[i],"-t") == 0)
-          failtime=i+1;
-          else if (strcmp(argv[i],"-help") == 0)
-          {
-               printf("------------------\n");
-               printf("| zPingStat r%3d |\n",build);
-               printf("------------------\n");
-               printf("\n");
-               printf(" No IP or domain name found.\n");
-               printf("\n");
-               printf(" Need argument.\n");
-               printf("\n");
-               printf(" example:\n");
-               printf(" ../zpingstat.exe -ip ya.ru -t 300\n");
-               printf(" or\n");
-               printf(" ../zpingstat.exe -t 150 -ip 127.0.0.1\n");
-               printf("\n");
-               printf(" -t / time to marked ping as fail.\n");
-               printf("\n");
-               printf("\n");
-               printf("------------------\n");
-               printf("| zLab  -  2011  |\n");
-               printf("------------------\n");
-               getch();
-               exit(1);
-           }
-          ;
+          {    iptrue=1;
+               ip=i+1;
+               string domain  =argv[ip];
+               }
+          if (strcmp(argv[i],"-t") == 0)
+          {    failtimetrue=1;
+               failtime=i+1;
+               string ftime   =argv[failtime];
+               }
+          if (strcmp(argv[i],"-help") == 0)
+               help=1;
     }
 
+if (iptrue == 0)
+    help=1;
+if (failtimetrue == 0)
+    string ftime   =("5000");
+
+//initVAR
     string doping  =("ping");
     string timeout =("-w");
-    string ftime   =argv[failtime];
     string repeat  =("-n 1");
-    string domain  =argv[ip];
     string nolog   =("> nul");
     doping.append(" ");
     doping.append(timeout);
@@ -121,13 +85,18 @@ for(int i =0;i<argc;i++)
     doping.append(domain);
     doping.append(" ");
     doping.append(nolog);
+if (help == 1)
+goto printHELP;
 
 //printTABLE:
   printTABLE:
 system("cls");
 REDRAW=0;
     printf(".-----------------------------------------------------------------.\n");
+if (failtimetrue == 1)
     printf("|  zPingStat     | IP : %15s   |    <%4sms Latency    |\n", argv[ip],argv[failtime]);
+else
+    printf("|  zPingStat     | IP : %15s   |    <5000ms Latency    |\n", argv[ip]);
     printf("|----------------|------------------------|-----------------------|\n");
     printf("|Type:           | Summary  | Miss | Good |  min  |  max  |  avg  |\n");
     printf("|----------------|----------|------|------|-------|-------|-------|\n");
@@ -146,7 +115,7 @@ REDRAW=0;
     printf("|1  min  (60)    | %8d | %3d%% | %3d%% | %3dms | %3dms | %3dms |\n",m1_all,m1_miss_prcnt,m1_good_prcnt,m1_min,m1_max,m1_avg);
     printf("`-----------------------------------------------------------------'\n");
     printf("\n");
-    printf("* Statistic update every %d query.\n",interval);
+    printf("* Statistic update every %s query.\n",interval);
     printf("* Latency statistic not calculated at this time.\n");
 
 // Reset block Start
@@ -172,7 +141,7 @@ REDRAW=0;
 //REDRAWtable:
   REDRAWtable:
 if (REDRAW==interval)
-goto getPercentage;
+   goto getPercentage;
  
 //  doPing:
     ping_check=system(doping.c_str());
@@ -248,5 +217,28 @@ m1_good_prcnt=m1_good*100/m1_all;
 
 goto printTABLE;
 
-    getch();
+//printHELP:
+  printHELP:
+               printf("------------------\n");
+               printf("| zPingStat r%3d |\n",build);
+               printf("------------------\n");
+               printf("\n");
+               printf(" No IP or domain name found.\n");
+               printf("\n");
+               printf(" Need argument.\n");
+               printf("\n");
+               printf(" example:\n");
+               printf(" ../zpingstat.exe -ip ya.ru -t 300\n");
+               printf(" or\n");
+               printf(" ../zpingstat.exe -ip 127.0.0.1\n");
+               printf("\n");
+               printf(" -t    / time to marked ping request as fail. Default is - 5000ms\n");
+               printf("\n");
+               printf(" -help / to show this message\n");
+               printf("\n");
+               printf("------------------\n");
+               printf("| zLab  -  2011  |\n");
+               printf("------------------\n");
+               getch();
+               exit(1);
 }
