@@ -13,13 +13,13 @@ using namespace std;
     zLab - 2011
     cc-by-nc-sa
     
-    r114
+    r115
 */
 
 int main(int argc, char *argv[])
 {
     int REDRAW,ip,ping_check,i,failtime,help,iptrue,failtimetrue;
-    int build=114;
+    int build=115;
 
 // ALL VAR
           int all_all,all_miss,all_good,all_min,all_max,all_avg;
@@ -47,37 +47,38 @@ int main(int argc, char *argv[])
 //ARGV check
 ip=i=failtime=help=iptrue=failtimetrue=0;
 
-string ftime   =("5000");
-string domain  =("t.co");
-
 for(int i =0;i<argc;i++)
     {     if (strcmp(argv[i],"-ip") == 0)
-          {    iptrue=1;
+          {
                ip=i+1;
-               string domain  =argv[ip];
+               iptrue=1;
                }
-          if (strcmp(argv[i],"-t") == 0)
-          {    failtimetrue=1;
+          else if (strcmp(argv[i],"-t") == 0)
+          {
                failtime=i+1;
-               string ftime   =argv[failtime];
+               failtimetrue=1;
                }
-          if (strcmp(argv[i],"-help") == 0)
-               help=1;
-    }
+          else if (strcmp(argv[i],"-help") == 0)
+          help=1;
+          }
 
 if (iptrue == 0)
-    help=1;
-if (failtimetrue == 0)
-    string ftime   =("5000");
+help=1;
 
 //initVAR
-    string doping  =("ping");
-    string timeout =("-w");
-    string repeat  =("-n 1");
-    string nolog   =("> nul");
+    string doping        =("ping");
+    string timeout       =("-w");
+    string ftime         =argv[failtime];
+    string ftimenone     =("5000");
+    string repeat        =("-n 1");
+    string domain        =argv[ip];
+    string nolog         =("> nul");
     doping.append(" ");
     doping.append(timeout);
     doping.append(" ");
+if (failtimetrue == 0)
+    doping.append(ftimenone);
+else
     doping.append(ftime);
     doping.append(" ");
     doping.append(repeat);
@@ -231,6 +232,8 @@ goto printTABLE;
                printf(" ../zpingstat.exe -ip ya.ru -t 300\n");
                printf(" or\n");
                printf(" ../zpingstat.exe -ip 127.0.0.1\n");
+               printf("\n");
+               printf(" -ip   / ip or domain\n");
                printf("\n");
                printf(" -t    / time to marked ping request as fail. Default is - 5000ms\n");
                printf("\n");
