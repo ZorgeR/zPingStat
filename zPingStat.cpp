@@ -115,7 +115,7 @@ else
     printf("|1  min  (60)    | %8d | %3d%% | %3d%% | %3dms | %3dms | %3dms |\n",m1_all,m1_miss_prcnt,m1_good_prcnt,m1_min,m1_max,m1_avg);
     printf("`-----------------------------------------------------------------'\n");
     printf("\n");
-    printf("* Statistic update every %s query.\n",interval);
+    printf("* Statistic update every %d query.\n",interval);
     printf("* Latency statistic not calculated at this time.\n");
 
 // Reset block Start
